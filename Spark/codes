@@ -1,0 +1,55 @@
+
+-- Log into hive environment
+hive
+
+
+-- create a table to load the dataset
+CREATE TABLE delay_flights (
+  Id INT,
+  Year INT,
+  Month INT,
+  DayOfMonth INT,
+  DayOfWeek INT,
+  DepTime INT,
+  CRSDepTime INT,
+  ArrTime INT,
+  CRSArrTime INT,
+  UniqueCarrier STRING,
+  FlightNum INT,
+  TailNum STRING,
+  ActualElapsedTime INT,
+  CRSElapsedTime INT,
+  AirTime INT,
+  ArrDelay DOUBLE,
+  DepDelay DOUBLE,
+  Origin STRING,
+  Dest STRING,
+  Distance INT,
+  TaxiIn INT,
+  TaxiOut INT,
+  Cancelled INT,
+  CancellationCode STRING,
+  Diverted DOUBLE,
+  CarrierDelay INT,
+  WeatherDelay INT,
+  NASDelay INT,
+  SecurityDelay INT,
+  LateAircraftDelay INT
+  ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LOCATION 's3://chami-delayed-flights-1/hiveSession/';
+
+
+-- view databses and tables
+show databases;
+show tables;
+describe delay_flights;
+
+
+-- load dataset to created able
+load data inpath 's3://chami-airline-delay/Input/DelayedFlights-updated.csv' into table delay_flights;
+
+
+
+-- run sql queries in on the table and get insights. 
+SELECT YEAR , avg((CarrierDelay/ArrDelay)*100) as Year_wise_Carrier_Delay FROM delay_flights GROUP BY YEAR ORDER BY YEAR DESC;
+
+SELECT YEAR , avg((NASDelay/ArrDelay)*100) as Year_wise_Nas_Delay FROM delay_flights GROUP BY YEAR ORDER BY YEAR DESC;

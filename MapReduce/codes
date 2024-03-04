@@ -1,0 +1,19 @@
+
+// Go to spark shell
+spark-shell
+
+// load dataset to df varible
+var df = spark.read.format("csv").load("s3://chami-delayed-flights-1/Input/DelayedFlights-updated.csv");
+// partition by year and save in s3
+df.write.format("parquet").partitionBy("_c1").save("s3://chami-delayed-flights-1/sparkSession/DelayedFlights-updated-df");
+// load that saved dataset again
+var df2 = spark.read.format("parquet").load("s3://chami-delayed-flights-1/sparkSession/DelayedFlights-updated-df");
+df2.show();
+
+// create a table using that dataset
+df2.createOrReplaceTempView("delayed_flights");
+
+
+// run sql queriesto get insights of data
+val result_df1 = spark.sql("SELECT _c1 as Year, avg((_c25/_c15)*100) as Year_wise_Carrier_Delay_Percentage FROM delayed_flights GROUP BY _c1 ORDER BY _c1 DESC");
+result_df1.show()
